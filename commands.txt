@@ -1,0 +1,495 @@
+
+-------------------------------------------------------------------- Common Linux Commands---------------------------------------------
+$ ls -lahr
+$ uname - display basic OS information
+$ hostname - display host name
+$ logname - display user name who originally logged on
+$ whoami - dispaly the user name of the current user
+$ who - who currently logged on
+$ uptime - system uptime since last reboot
+$ last - displays the history of successful user logins & system reboots
+$ lastb -  display the history of failed user login attempts
+$ lastlog - displays the most recent login for each individual user account
+
+-- Compression
+$ zip <target file>.zip <source file>  / unzip <source file>.zip   - keep the source file
+$ gzip <source file>  / gunzip <source file>.gz - deletes the source file
+$ gzip2 <source file> / bunzip2 <source file>.bz2 - deletes the source file
+
+--- Archiving
+$ tar cvf <target>.tar <source> - compress
+$ tar xvf <source>.tar - extract
+$ tar tvf <source>.tar - list the tar content
+$ tar cvzf  <target>.tar.gz  <source> – z is to use the gz rule
+$ tar cvjf  <target>.tar.bz  <source> – z is to use the bzip rule 
+
+--- manual
+$ mandb - update manual
+$ man ls - list all manual
+$ apropos <key word>  - search for word in online manual
+
+-- File system
+Disk based file systems are / , /boot , /usr , /var , /home , /opt , /tmp
+Memory based file systems are /dev , /media , /proc
+
+----------------------------------------------------------------- Files & Permissions --------------------------------------------------------------
+
+File Types : regular, directory, symbolic link and device
+	Regular files such as text and binary (-)
+	Directory files are logical containers (d)
+	Symbolic files are soft links (l)
+	Device files are hardware related files 
+		Block device file (b) such as parallel communication devices such like USB and Hard Drive
+		Raw (character) device file (C) such as serial communication devices like keyboard and mouse
+		$ ls -la
+		$ ls -la /dev/sda
+		
+Directory:
+$ mkdir –pv
+
+Linking File:
+A symbolic link, also known as a symlink or soft link, is a special type of file that points to another file or directory.
+- Hard links. You can think a hard link as an additional name for an existing file. Hard links are associating two or more file names with the same inode. You can create one or more hard links for a single file. Hard links cannot  be created for directories and files on a different filesystem or partition.
+	$ ln /etc/profile profile
+
+- Soft links. A soft link is something like a shortcut in Windows. It is an indirect pointer to a file or directory. Unlike a hard link, a symbolic link can point to a file or a directory on a different filesystem or partition.
+	$ $ ln –s anaconda-ks.cfg /boot/anaconda.cfg
+
+Inode number = index node number from inode table in linux file system which contains all file in a given file system, it contains file size, file ownership, file owner group, file permissions, file type, disk location etc…
+
+
+-- Permissions
+$ chmod <permission> <file/folder> - change permission 
+$ chmod 654 filename
+$ chmod o=rwx filename 
+
+User/Group/Other = 4/2/1 = R/W/X
+u/g/o/a =>  u+r = grant read access from user
+			g-rwx = remove read/write/execute access from group	
+			o=rwx = 
+
+$ chown user:group filename - change owner
+$ chgrp group_name filename - change group
+
+-- special permission
+setUID (4) : represented by letter "s", SetUID command is used level permission, when a user own's executable and want to give an execute permission to other user to run as owner.  The setuid bit has no effect on directories.
+	> $chmod u+s <filename> , $ chmod 4755 <filename> -- -rwsr-xr-x
+	
+setGID (2) : setGid is group & file level permission on shared directory. When executing files with setgid, the execution runs on the group ID instead fo the executor user ID.  With this bit set, files created in the directory get group membership of the directory
+	> chmod  2770  <folder Name>   -- drwxrwsr-x
+
+Sticky Bit (1) : Set on public writeable directories at the other level; represented by letter “t”
+	> $ chmod o+t <folder name>
+	> $ chmod 1755 <folder name>
+	With this bit set, users cannot delete other users’ files
+	Typically set on /tmp and /var/tmp public writeable directories
+  
+------------------------------------------------------------------ Shell & Cron--------------------------------------------------------------
+-- variable
+$ var1=college
+$ echo $var1
+$ unset $var1
+
+-- processes
+$ ps
+$ ps -ef
+$ ps -ef | grep {process name}
+
+-- Cron
+$ /etc/cron.allow
+$ /etc/cron.deny
+$ /var/log/cron  - scheduler log file
+$ crontab –l      - show cron content
+$ /etc/crontab
+[minute][hour][day][month][day of the week] [command]
+
+-------------------------------------------------------------------- Package Management --------------------------------------------------------------
+
+$ whereis yum
+$ whereis dnf
+$ /var/lib/rpm - yum metadata information
+$ rpm -qa (q = query, a = all) , rpm -qa | grep zip
+$ rpm  -ivh  /mnt/Packages/zsh-5.0.2-14.el7.x86_64.rpm  , (-i = install, -v = verbos , -h = hash(show progress))
+	$ mount -a
+$ rpm list - list all available packages
+$ rpm -ivh <package name>.rpm - install package
+$ rpm -Uvh <package name>.rpm - update package
+$ rpm -e <package name>.rpm - remove package  
+
+$ yum repolist -v
+$ yum list installed	
+$ yum list available
+$ yum search <String>
+$ yum  -y  install <packge name> -install
+$ yum  -y  update <packge name> -update
+$ yum  -y  install -update all packages
+$ yum info <package name>
+$ yum check-update
+$ yum tar
+$ yum check-update | grep ^tar > rpm -q tar > yum update-to tar*
+
+-------------------------------------------------------------------- Boot Process & Kernel --------------------------------------------------------------
+Linux Boot Process : Firmware > GRUB > Kernel > Initialization
+The default boot target is graphical
+
+Verion of running kernel 
+$ uname -r
+$ rpm -q kernel
+
+Kernel files are stored in one of two places
+/boot: created at system installation time and stores current and previous kernels and associated files
+/proc: virtual file system
+    cat  /proc/cpuinfo
+	cat  /proc/meminfo
+
+systemd (system daemon) is a new system initialization method
+Some of the major benefits of systemd are:
+	Parallel processing of startup scripts
+	Automatic handling of service dependencies
+	On-demand activation of services
+
+Unit is a system configuration file
+Targets are a collection of unit file
+
+$ systemctl set-default <> - takes effect on next boot
+$ systemctl isolate <> - takes effect immediately 
+$ systemctl  enable/disable  crond  --- auto start a service or no
+$ systemctl  start/restart/stop/reload/status/show  crond
+$ systemctl  is-active/is-enabled  crond
+
+-- System Logging
+Daemon : rsyslogd
+Configuration file: /etc/rsyslog.conf + files in /etc/rsyslog.d
+Log file: /var/log/
+
+-------------------------------------------------------------------- User Groups --------------------------------
+# Create user account
+	$ sudo useradd username# User account information is stored in user authentication files: 
+	$ /etc/passwd: contains user login data 
+	$ /etc/shadow: Contains extended user authentication information
+	$ /etc/group: contains group information
+	$ /etc/gshadow
+
+# create non interactive user : 
+	$ adduser username -s /sbin/nologin
+# delete existing user
+	$ userdel <option> <username>
+
+# chage change users password expiration
+	$ chage <option> <user name>
+
+# groupadd to create new group
+	$ groupadd <option> <group name>
+
+# groupmod to modify existing group
+	$ groupmod <option> <group name>
+	
+# groupdel to delete existing group 
+	$ groupdel <option> <group name>
+
+# modify existing account in linux
+	$ usermod <option> <argument> <user name> : usermod -c 'This is a comment' user1 , usermod -d /home/users/user1 user1, usermod -e 2014-11-01 user1
+		-c = We can add comment field for the useraccount.
+		-d = To modify the directory for any existing user account.
+		-e = Using this option we can make the account expiry in specific period.
+		-g = Change the primary group for a User.
+		-G = To add a supplementary groups.
+		-a = To add anyone of the group to a secondary group.
+		-l = To change the login name from tecmint to tecmint_admin.
+		-L = To lock the user account. This will lock the password so we can’t use the account.
+		-m = moving the contents of the home directory from existing home dir to new dir.
+		-p = To Use un-encrypted password for the new password. (NOT Secured).
+		-s = Create a Specified shell for new accounts.
+		-u = Used to Assigned UID for the user account between 0 to 999.
+		-U = To unlock the user accounts. This will remove the password lock and allow us to use the user account.
+    
+-------------------------------------------------------------------- Disk Partition ------------------------------------------
+# Virtual Objects are Physical Volume (PV) , Volume Group (VG) & Logical Volume (LV)
+# PV is divided into Physical Extents (PE) in VG
+# VG is divided into one or more logical partition called LV
+
+# lsblk command lists all disk currently availabe with size , partition status
+# parted command is used to view specific disk informaton
+	$ parted /dev/sdb1
+
+# mklabel used to label the disk	
+	$ mklabel > <disk name>
+	$ mklabel msdos  (bsd / loop (raw disk access) / gpt / mac / msdos / pc98 / sun)
+
+# mkpart used to partition newly created disk
+	$ mkpart  > primary / extended > File System type (ext2/ext3/ext4) > start 1 (1MB) > end 1024 (1GB)
+	$ parted /dev/sdb mkpart pri 1025 2048
+	
+# parted /dev/sdb rm <partition number> : to remove a partition 
+
+# PVCreate to initiate a disk / partition for Logical Volume Manager (LVM) use
+	$ pvcreate /dev/sdb
+
+# PVS command used to verify / list physical volumne available
+	$ pvs
+
+# Create a volumne group and add the physical volume (PVCreate) to this group
+	$ vgcreate <volumen group label> <disk name>
+	$ vgcreate VG_One /dev/sdc
+
+# vgs command is volumne group summary to provide a list of vgs information
+	$ vgs
+
+# create logical volumne (LV) on the physical volume created above
+	$ lvcreate -L <size in mb> -n <Logical group label> <volumen group name>
+	$ lvcreate -L 600 -n LV_One VG_One
+	
+# lvs command provides the logical volumne summary information
+	$ lvs
+	
+# vgdisplay command is volumen group display which provides a detail information on the entire volumne group	
+	$ vgdisplay
+	$ vgdisplay -v <volumen group name> : volumen group specific information
+	$ vgdisplay -v <Volume Group name> | more
+	
+# mkfs command to create a file system in 
+	$ mkfs -t <file system type> /dev/<volumne group name>/<logical group name> : -t file system type
+	$ mkfs -t xfs /dev/VG_One/LV_One
+	
+# mount volumne/disk
+	$ mkdir /<volumne name>  
+	$ mkdir /newvolume
+	$ mount /dev/<Volumen Group>/<Logical Group> /<mount point>
+	  mount /dev/VG_One/LG_One /newvolumne
+
+# check volumen with df -h
+
+# unmount file system
+	$ umount /newvolumne
+
+# edit the /etc/fstab and add teh newly created volumne for an automatic mount 
+	$ /dev/VG_One/LG_One /newvolumne xfs 0 0
+	$ mount -a
+	
+-------------------------------------------------------------------- File System & Swaps --------------------------------------------------------------
+# Advantages of using file systems:
+		Make a file system accessible or inaccessible to users independent of other file systems
+		Perform repair activities on individual file systems
+		Keep dissimilar data in separate file systems
+		Optimize each file system independently
+		Grow or shrink a file system independent of other file systems
+
+# File system types are disk (hard drive/CD), network (NFS) or memory (/proc) based
+
+# tune2fs & blkid commands provides Universal Unique ID of a file system 
+	$ tune2fs  -l  /dev/sda1  |  grep  UUID	
+	$ blkid  |  grep  sda1	
+
+# Create Swaps in disk 
+	$ lsblk to view a summary of the disk
+	$ mkswap /dev/sdb  = create swap file in /dev/sdb
+	$ swapon /dev/sdb  - to active swap file
+	$ swapoff /dev/sdb  - to deactive swap file
+	$ free -m - to view swap file usage status in Megabyte
+
+# Create Swap file in LVM Logical Volumne
+	$ lvs to view a summary of the logical volume
+	$ mkswap /dev/<logical volumne group name>/<logical volumen name>
+			$ mkswap /dev/labVG/lablv
+
+	$ swapon /dev/labVG/lablv  -- to activate logical swap
+	$ swapoff /dev/labVG/lablv  -- to deactivate logical swap
+	
+# To auto active swap file in /etc/fstab
+	$ UUID swap swap defaults 0 0  --- for disk swap, UUID is found during mkswap command
+	$ /dev/labVG/lablv swap swap defaults 0 0   -- for logical volumn 
+	$ swapon -a  == a for activate all swap files in the machine
+
+-------------------------------------------------------------------- Firewall &  SELinux --------------------------------------------------------------
+# IPTables is a host based packet filtering firewall
+
+# SELinux policy rules define how processes interact with files and with each other and it is enforced system wide
+
+# SELinux adds Mandatory Access Control to the kernel, these added security controls are stored in labels (contexts) and are applied to files, processes, ports, etc.
+
+		$ ps -eZ   -- To view SELinux contexts on processes: 
+		$ ls -l -Z -- To view SELinux contexts on files: 
+
+# Firewall rules are stored in /usr/lib/firewalld and /etc/firewalld
+
+
+# Display what has been added & removes:
+	$ cat /etc/firewalld/zones/public.xml
+
+# /usr/lib/firewalld/zones directory contains pre-defined zone templates 
+	$ systemctl enable firewalld ; 
+	$ systemctl start firewalld;
+	
+# Determine the current default zone:
+	$ firewall-cmd  --get-default-zone
+
+# List and add a permanent rule for http service:
+	$ firewall-cmd  --list-services
+	$ firewall-cmd  --permanent  --add-service=http
+	$ firewall-cmd  --reload
+
+# List and add a port:
+	$ firewall-cmd  --list-ports
+	$ firewall-cmd  --add-port=443/tcp
+
+# Remove the permanent rule for http service:
+	$ firewall-cmd  --permanent  --remove-service=http
+	$ firewall-cmd  --reload
+	$ firewall-cmd  --list-services
+
+# Remove the port:
+	$ firewall-cmd  --remove-port=443/tcp
+	$ firewall-cmd  --list-ports
+
+-------------------------------------------------------------------- Network Interface &  NTP --------------------------------------------------------------
+# Hostname defined on /etc/hostname file
+	$	hostname
+	$ 	hostnamectl
+	$ 	uname -n
+	$	echo $HOSTNAME
+
+# To modify host name 
+	$ 	hostnamectl  set-hostname  <new_hostname>
+	$ 	editing: /etc/hostname file and running systemctl  restart  systemd-hostnamed
+	
+# IP address is viewed or modified 
+	$	ip addr
+	$	ifconfig
+	$	nmcli
+
+# Check IP address
+    $	ifconfig -a
+	$	ip addr (ip a)
+	$	hostname -I | awk '{print $1}'
+
+# Services : Ports are defined in /etc/services
+
+# Interface configuration file holds networking information; one file per interface; stored in /etc/sysconfig/network-scripts directory as ifcfg-xxxxxx and so on
+/etc/sysconfig/network/network-scripts
+
+# Add new NIC IP Address
+nmcli c add con-name enp0s3 ifname enp0s3 ipv4.addresses 192.168.0.150 ipv4.gateway 192.168.0.2 ipv4.dns 192.168.0.2 type Ethernet 
+
+# Modify existing NIC IP Address
+nmcli c mod enp0s3 ipv4.addresses 192.168.0.150 ipv4.gateway 192.168.0.2 ipv4.dns 192.168.0.2 
+
+nmcli c add con-name 
+
+nmcli connection down <enp0s8a> == deactivate a network interface
+nmcli connection up <enp0s8a> == activate a network interface
+
+
+systemctl status NetworkManager
+
+### NTP
+# Network Time Protocol used for synchrosing the system clock
+# NTP is implemented by service called Chrony found in /etc/chrony.conf
+	$ chronyd : chrony deamon
+	$ chronyc : management command
+	
+# Chrony commands 		
+	$ timedatactl : controls the system time & date
+	$ chronyc  sources  -v : display information about the current time sources.
+	$ chronyc  tracking : provides statistical information
+
+	$ sudo yum install chrony
+		# systemctl enable chronyd
+		# systemctl start  chronyd
+		# systemctl status chronyd
+
+-------------------------------------------------------------------- Advanced Package Management and NFS-AutoFS --------------------------------------------------------------
+# Package Group is a collection of correlated packages
+	$ yum group list
+	$ yum group list installed / available
+	$ yum group list hidden
+	$ yum group summary
+	$ yum group info Base -- list packages in a group
+	$ yum group install <package name>
+	$ yum group remove <package name>
+
+# Module is a logical set of application packages, where multiple version of a software is available in a single repolist
+
+# Stream is a collection of packages organized by version, each module will have multiple stream
+
+# Profile is a list of recommended packages organized for purpose-built, convenient deployments (minimal, development, common, client, server, etc)
+# Each module stream can have zero, one, or more profiles but with only one marked as the default
+
+Package > Module > Stream > Profile
+	$ yum module list : list all modules
+	$ yum module list -- enabled  : list enabled modules 
+	$ yum module list <package name>  : list specific module information
+	$ yum module list <package name>:<version> : list stream in a module
+	$ 
+	
+dnf group install <package group name>
+$ dnf install @perl:5.26/minimal to pick the version of the package in a module
+$ dnf module reset pearl ==== neither enable nor disable
+$ dnf module remove pearl === remove pearl
+
+-----------------------------------------------------
+
+Server 1 as NFS Server
+install nfs-utils and rpcbind package (rpm -qa |grep rpcbind , rpm -qa |grep nfs)
+mkdir /common
+chmod 777 /common
+create /etc/exports file (nano /etc/exports) and type "/common -rw" and save file
+set /common/current file as -rwsr-xr-x
+systemctl  enable nfs-server
+systemctl start nfs-server
+systemctl status nfs-server
+
+firewall-cmd --permanent --add-service=nfs
+firewall-cmd --reload
+exportfs
+
+Server 2 as client using standard NFS mount
+mkdir /client
+mount -t nfs  <nfs server IP>:/<nfs folder> /client
+df -ln
+
+Server 2 as NDS Client using AutoFS
+rpm -qa | grep autodfs ---check if autofs is installed 
+yum install autofs nfs-utils
+mkdir /automnt
+chmod 777 /automnt
+Create a file in /etc/ such as /etc/auto.test
+Edit /etc/auto.master and add /- /etc/auto.test
+Edit /etc/auto.test and add the following
+	/automnt <NFS server iP>:/common
+systemctl enable autofs
+systemctl start autofs
+systemctl status autofs
+df -h -- to check df
+ls /automnt --- to verify content
+The autofs will only mount the shared file system whenever a user try to access the content.
+
+---------------------
+Creating home directory mount
+1. On NFS server edit /etc/exports
+	/common -rw  -- shared folder 
+	/home -rw  -- for all users home direcotry
+  $ exportfs -arv
+
+2. On Client Side
+	mv /home/user1 /home/user1.bak -- remove existing user home directoy first
+   update /etc/auto.test and add the home directory
+   /automnt <NFS Server IP>:/common
+   * <NFS Server IP>:/home/&       --- * means any home directory coming from NFS Server
+ 
+-------------------------------------------------------------------- Advanced Disk Mgmt and Journaling --------------------------------------------------------------
+
+# Install vdo packages:
+	$ yum  install  vdo  kmod-kvdo
+
+# lsblk to view the volumne name
+
+# Create VDO volume called vdo-vol1 of logical size 16GB on sdc:
+	$  vdo  create  --device  /dev/sdb  --name  vdo-vol1  --vdoLogicalSize  16G  --vdoSlabSize  128
+
+# Create file system:
+	$ mkfs.xfs  /dev/mapper/vdo-vol1
+
+# Mount the disk with mount -a or fstab
+	$ mkdir /vol1
+	$ mount /dev/mapper/vdo-vol1 /vol1
+	$ /dev/mapper/vdo-vol1 /vdo1 xfs defaults 0 0 ----- in fstab
